@@ -7,9 +7,9 @@
 
 using namespace std;
 
-Session::Session(int sidt)
+Session::Session(int cfdt)
 {
-	sid =sidt;
+	cfd =cfdt;
 }
 
 int Session::HandleConnection()

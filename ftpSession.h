@@ -9,9 +9,9 @@ using namespace std;
 class Session
 {
 public:
-	Session(int sidt);
+	Session(int cfdt);
 private:
-	int sid;
+	int cfd;
 	string rootdir;
 	string currentdir;
 	string uname;
