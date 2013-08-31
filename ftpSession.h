@@ -16,5 +16,6 @@ private:
 	string currentdir;
 	string uname;
 	string upassword;
-	HandleConnection(); 
+public:
+	int HandleConnection(); 
 };

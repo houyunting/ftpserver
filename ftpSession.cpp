@@ -12,7 +12,7 @@ Session::Session(int sidt)
 	sid =sidt;
 }
 
-Session::Session()
+int Session::HandleConnection()
 {
 	
 
