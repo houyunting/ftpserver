@@ -15,17 +15,6 @@ Session::Session(int sidt)
 Session::Session()
 {
 	
+
 	return 0;
 }
-class Session
-{
-public:
-	Session(int sidt);
-private:
-	int sid;
-	string rootdir;
-	string currentdir;
-	string uname;
-	string upassword;
-	int HandleConnection(); 
-};
