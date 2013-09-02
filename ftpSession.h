@@ -2,6 +2,7 @@
 #include<sys/socket.h>
 #include<sys/types.h>
 #include<netdb.h>
+#include<string>
 
 
 using namespace std;
@@ -17,5 +18,6 @@ private:
 	string uname;
 	string upassword;
 public:
-	int HandleConnection(); 
+	int HandleConnection();
+	string parseCmd(char []); 
 };
