@@ -16,7 +16,7 @@ int main()
 
 	struct sockaddr_in  sai;
 	sai.sin_family = AF_INET;
-	sai.sin_port = htons(6008);
+	sai.sin_port = htons(6000);
 	sai.sin_addr.s_addr = htonl(INADDR_ANY);
 	cout << INADDR_ANY;
 
