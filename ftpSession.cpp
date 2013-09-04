@@ -78,6 +78,8 @@ int Session::HandleConnection()
 			putHandle(cmd, cmd_buf);
 		else if(cmd.compare("PORT") == 0)
 			portHandle(cmd, cmd_buf);
+		else if(cmd.compare("PASV") == 0)
+			pasvHandle(cmd, cmd_buf);
 		else
 			undefHandle(cmd, cmd_buf);
 		//if();
@@ -180,9 +182,54 @@ int Session::retrHandle(string c, char c_b[])
 	char sucess[] = "150 retr sucess\r\n";
 	int send_sz = send(cfd, sucess,strlen(sucess),0);
 
-	char data[] = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-	int send_dsz = send(dfd, data, sizeof(data), 0);
-	cout << "data size " << send_dsz << endl;
+	dfd = socket(AF_INET, SOCK_STREAM, 0);
+	if(dfd == -1)
+	{
+		cout << "socket create error in port handle\n";
+		return -1;
+	}
+	
+
+	sai.sin_family = AF_INET;
+	sai.sin_port = htons(atoi(arg_vec[4].c_str())*256 + atoi(arg_vec[5].c_str()));
+	cout << "port Number " << atoi(arg_vec[4].c_str())*256 + atoi(arg_vec[5].c_str()) << "\n";
+	sai.sin_addr.s_addr = inet_addr((arg_vec[0] + '.' + arg_vec[1] + '.'+ arg_vec[2] + '.'+ arg_vec[3]).c_str());
+	cout << "add " << (arg_vec[0] + '.' + arg_vec[1] + '.'+ arg_vec[2] + '.'+ arg_vec[3]).c_str() << "\n";
+	if(connect(dfd, (struct sockaddr *) &sai, sizeof(sockaddr)) == -1)
+	{
+		cout << "error in retr handle \n";
+		cout << "errno " << errno << "\n";
+		cout << strerror(errno);
+		return -1;
+	}
+
+	FILE* pf = fopen(parseArg(c_b).c_str(), "r");
+	if(pf == NULL)
+	{
+		perror("open file error");
+	}
+	char data[1024];
+	memset(data, 0, 1024);
+	while(1)
+	{	
+		int rd_sz = fread(data, 1, 1024, pf);
+		if(rd_sz == 0)
+		{
+			break;
+		}
+		cout << "read data size " << rd_sz << "\n";
+		int send_dsz = send(dfd, data, rd_sz, 0);
+		cout << "data size " << send_dsz << endl;
+	}
+	fclose(pf);
+	
+	close(dfd);
+	
+
+
+	char sucess2[] = "226 data send finish\r\n";
+	send_sz = send(cfd, sucess2,strlen(sucess2),0);
+	cout << "send_sz 226 data send finish\r\n";
 	return 0;
 }
 int Session::putHandle(string c, char c_b[])
@@ -196,41 +243,59 @@ int Session::portHandle(string c, char c_b[])
 	string cmd = parseCmd(c_b);
 	string arg = parseArg(c_b);
 	char pc = ',';
-	vector<string> arg_vec = split(arg, &pc);
+	arg_vec = split(arg, &pc);
 	for(auto i : arg_vec)
 	{
 		cout << i << "\n";
 	}
-	dfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(dfd == -1)
-	{
-		cout << "socket create error in port handle\n";
-		return -1;
-	}
-	
-	sai;
-	sai.sin_family = AF_INET;
-	sai.sin_port = htonl(atoi(arg_vec[4].c_str())*256 + atoi(arg_vec[5].c_str()));
-	sai.sin_addr.s_addr = inet_addr((arg_vec[0] + '.' + arg_vec[1] + '.'+ arg_vec[2] + '.'+ arg_vec[3]).c_str());
+
+
+	/*sai.sin_family = AF_INET;
+	sai.sin_port = htonl(20);
+	sai.sin_addr.s_addr = htonl(INADDR_ANY);
+
 	int rbd = bind(dfd, (struct sockaddr *)&sai, sizeof(sai));
 	if(rbd == -1)
 	{
 		cout << "bind error in port handle\n";
 		return -1;
-	}
-
-	if(connect(dfd, (struct sockaddr *) &sai, sizeof(sai)) == -1)
-	{
-		cout << "error in port handle \n";
-		cout << strerror(errno);
-		return -1;
-	}
+	}*/
 	
 	
 	char sucess[] = "200 port sucess\r\n";
 	int send_sz = send(cfd, sucess,strlen(sucess),0);
 	return 0;
 }
+
+
+int Session::pasvHandle(string c, char c_b[])
+{
+	cout << "pasv Handle \n";
+	
+	char sucess[] = "227 Entering Passive Mode 127,0,0,1,195,149\r\n";
+	int send_sz = send(cfd, sucess,strlen(sucess),0);
+
+	dfd = socket(AF_INET, SOCK_STREAM, 0);
+	if(dfd == -1)
+	{
+		cout << "socket create error in pasv handle\n";
+		return -1;
+	}
+	
+
+	sai.sin_family = AF_INET;
+	sai.sin_port = htonl(195*256+149);
+	sai.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+	int rbd = bind(dfd, (struct sockaddr *)&sai, sizeof(sai));
+	if(listen(dfd, 1) == -1)
+	{
+		cout << "pasv " << strerror(errno) << "\n";
+	}
+	return 0;
+}
+
+
 int Session::undefHandle(string c, char c_b[])
 {
 	cout << "undef Handle \n";
@@ -238,3 +303,5 @@ int Session::undefHandle(string c, char c_b[])
 	int send_sz = send(cfd, sucess,strlen(sucess),0);
 	return 0;
 }
+
+

@@ -3,6 +3,7 @@
 #include<sys/types.h>
 #include<netdb.h>
 #include<string>
+#include<vector>
 
 
 using namespace std;
@@ -19,6 +20,7 @@ private:
 	string currentdir;
 	string uname;
 	string upassword;
+	vector<string> arg_vec;
 public:
 	int HandleConnection();
 	string parseCmd(char []);
@@ -28,5 +30,6 @@ public:
 	int retrHandle(string c, char c_b[]);
 	int putHandle(string c, char c_b[]);
 	int portHandle(string c, char c_b[]);
+int pasvHandle(string c, char c_b[]);
 	int undefHandle(string c, char c_b[]);
 };
