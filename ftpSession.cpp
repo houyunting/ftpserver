@@ -11,6 +11,7 @@
 #include<arpa/inet.h>
 
 
+
 using namespace std;
 
 vector<string> split(string& str,const char* c)
@@ -206,7 +207,11 @@ int Session::retrHandle(string c, char c_b[])
 	FILE* pf = fopen(parseArg(c_b).c_str(), "r");
 	if(pf == NULL)
 	{
+		char sucess1[] = "550 file not found\r\n";
+		send_sz = send(cfd, sucess1,strlen(sucess1),0);
 		perror("open file error");
+		close(dfd);
+		return -1;
 	}
 	char data[1024];
 	memset(data, 0, 1024);

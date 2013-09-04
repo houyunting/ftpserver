@@ -1,3 +1,6 @@
+#ifdef FTP_SESSION_H
+#define FTP_SESSION_H
+
 #include<iostream>
 #include<sys/socket.h>
 #include<sys/types.h>
@@ -33,3 +36,5 @@ public:
 int pasvHandle(string c, char c_b[]);
 	int undefHandle(string c, char c_b[]);
 };
+
+#endif //FTP_SESSION_H
